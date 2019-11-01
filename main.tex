@@ -140,7 +140,7 @@ I did the first part correctly (\mintinline{R}|interviews <- interviews[100, ]|)
 
 \subsection{Data Carpentry}
 
-\subsubsection{Lesson 4: Introducing \mintinline{R}|dplyr| and \mintinline{R}|tidyr|}
+\subsubsection{Lesson 4: Introducing dplyr and tidyr}
 
 \textbf{Intention}: Complete Data Carpentry on R, Lesson 4.
 
@@ -215,7 +215,7 @@ This seems to be how it’s supposed to work, but I’m not fully wrapping my he
 
 \includegraphics[width=1.0\textwidth]{rstudio_23.PNG}}
 
-\itemizederror{??}
+\itemizederror{NA vs /}
 {\item The exercise going through the Applying \mintinline{R}|spread()| to clean our data process states that the last column in the data frame after running }
 
 \begin{minted}[breaklines]{R}
@@ -256,7 +256,7 @@ Perhaps it was just showing NA before because the value was NA, and the Data Car
 
 \textbf{Intention}: Complete final lesson for Working with R for Social Scientists: Data Visualisation with ggplot2.
 
-\subsubsection{Lesson 4: Data Visualisation with ggplot2}
+\subsubsection{Lesson 5: Data Visualisation with ggplot2}
 
 \textbf{Actions}: Working through the instructions on the Data Carpentry site, I finish the last lesson for R, answering the following questions:
 
@@ -353,5 +353,58 @@ It says my page should look like this
 Which it does. But still error 410. I have sent a Slack message to Brian and will ask tomorrow at consultation hours.
 
 \textbf{Result}: Duplicati partially set up again. Learning journal uploaded to CloudStor 24/10/19 as pdf.
+
+\newpage
+\section{Friday October 25th 2019}
+
+\subsection{Duplicati - Data Recovery}
+
+\textbf{Intention}: Set up multiple configurations for multiple destinations for my FOAR705 files.
+
+\textbf{Actions}: In class, we were guided through the process of setting up a backup configuration using CloudStor as our online server. After class, Brian helped me create an additional backup configuration for backing up to my OneDrive (Microsoft) account.
+
+\itemizederror{Wrong Version of OneDrive}{
+\item Initially we could not get the connection to work, and kept getting 'Error 410: Gone'
+\item Looking up the issue online and consulting an online forum, we changed the Version of the OneDrive selected and it suddenly worked. Huzzah.}
+
+\textbf{Result}: Files successfully set up to be backed up every night to two online destinations. Organised to demonstrate data recovery next week with Brian. (Update: data recovery was successful. at first, I didn't realise I had to save a file of the configuration and send it to myself via email, but after seeing how this is done, the process made sense. 30-10-19)
+
+\newpage
+\section{Thursday October 21st 2019}
+
+\subsection{Proof of Concept R Scripts}
+
+\subsubsection{Extract Source Images}
+
+\textbf{Intention}: Develop R script that can parse a YAML file into RStudio, extract the information that pertains to the PNG file contained within said YAML file, convert it from the Base64 language in which it is encoded, and then write it to a PNG file.
+
+\textbf{Actions}: Using RStudio, I follow some R Documentation guides, along with advice from Brian to develop the code function by function.
+
+First, I need to parse the YAML file. I have named the YAML file `extract-source-images.yml.' In order to work with YAML files within RStudio, I need to load the YAML package. I do so by downloading it from the Packages tab in the "Files" pane (bottom right). In order to parse the file in RSTudio I will need to use the function \mintinline{R}|yaml.load_file()|.
+
+\mintinline{R}|yaml.load_file(file.path("data","extract-source-images.yml"))|
+
+This code works!
+
+Next, I need to extract some info from within the file.
+
+The HI Workbench project I exported as a YAML file has no Gardiner Codes in it, but it does have two image files, called `wall\_photo' and `line\_drawing.'
+
+\includegraphics[width=1.0\textwidth]{sublime_1.PNG}
+
+The path to this information looks like this:
+
+files - sources - (unnamed) - dataURL
+
+\itemizederror{Unnamed directory?}
+{\item When figuring out the path to tell the function to follow in order to extract the image, I notice an empty space where I expect a directory name. Brian explains that this means this is an unnamed directory that exists in order to store an undefined number of sub-files (ie. the images). In order to incorporate this into a file path, we need to use a `for loop.'}
+
+We also create a variable to incorporate into the For Loop that will parse all the YAML files, rather than just the one (there are three in the data folder)
+
+\includegraphics[width=1.0\textwidth]{rstudio_50.PNG}
+
+When running this script, all YAML files are parsed in RStudio, then the dataURL that contains the information for the PNG files is extracted, the head of the dataURL is removed, as it is not needed, then what is left is decoded from Base64 (I downloaded the base64enc package for this), then written as a PNG file into the output_data folder.
+
+\textbf{Result}: Script for extracting source images from YAML files runs successfully and outputs the PNG files to the output\_data folder.
 
 \end{document}
