@@ -4,6 +4,7 @@
 \usepackage{foar705journal}
 \usepackage{subfiles}
 \usepackage{minted}
+%https://www.overleaf.com/learn/latex/Code_Highlighting_with_minted
 \usepackage{ifthen}
 %https://tex.stackexchange.com/questions/170739/fancyverb-error-when-using-minted-in-a-ifthenelse
 \usepackage{graphicx}
@@ -181,13 +182,20 @@ filter(memb_assoc == "yes")%>%
 select(affect_conflicts, liv_count, no_meals)
 \end{minted}
 
-Checking solution, I see that I got this down pat.
 
 \itemizederror{Understanding Filter Function}
-{\item
-\begin{minted}[breaklines]{R}interviews_god <- select(filter(interviews, village == "God"), no\_membrs, years\_liv)\end{minted}
-\item I don’t understand the break down of this construction.
-\item \mintinline{R}|filter| acts on \mintinline{R}|interviews| as the data frame, but what data frame does \mintinline{R}|select work| on in order to also select \mintinline{R}|no_members| and \mintinline{R}|years_liv?|}
+{\item Checking solution, I see that I got this down pat.}
+
+
+\mintinline{R}|interviews_god <- select(filter(interviews, village == "God"), no_membrs, years_liv|
+
+
+I don’t understand the break down of this construction. \mintinline{R}|filter| acts on 
+\mintinline{R}|interviews| as the data frame, but what data frame does \mintinline{R}|select work| on in order to also select \mintinline{R}|no_members| and \mintinline{R}|years_liv| ?
+
+
+
+
 \textit{How can I create new columns or remove existing columns from a data frame}?
 Using the \mintinline{R}|mutate| function, you can add a column by using information in other columns.
 In the exercise, I got an answer that was close, but in the wrong order:
@@ -211,17 +219,21 @@ Eeshaping by gathering and spreading – creating new tables using variables and
 \item It indicated that a separate new table would be created with 4 rows, but it appeared to just add them onto the end of the existing table:
 \includegraphics[width=1.0\textwidth]{rstudio_22.PNG}
 This seems to be how it’s supposed to work, but I’m not fully wrapping my head around the concept. The highlighted line is the one I’m having trouble understanding:
+
 \includegraphics[width=1.0\textwidth]{rstudio_23.PNG}}
 
 \itemizederror{??}
-{\item The exercise going through the Applying \mintinline{R}|spread()| to clean our data process states that the last column in the data frame after running 
+{\item The exercise going through the Applying \mintinline{R}|spread()| to clean our data process states that the last column in the data frame after running }
+
+
 \begin{minted}[breaklines]{R}
 interviews_items_owned <- interviews \begin{verbatim}%>%\end{verbatim}
 separate_rows(items_owned, sep=";") \begin{verbatim}%>%\end{verbatim}
 mutate(items_owned_logical = TRUE) \begin{verbatim}%>%\end{verbatim}
 spread(key = items_owned, value = items_owned_logical, fill = FALSE)’
 \end{minted}
-is \begin{verbatim}/end{verbatim} and that it needs to be renamed to be called `NA, but mine is already called that:
+is \begin{verbatim}/\end{verbatim}
+and that it needs to be renamed to be called `NA, but mine is already called that:
 \includegraphics[width=1.0\textwidth]{rstudio_24.PNG}
 Reading further on, after running
 \begin{minted}[breaklines]{R}
@@ -229,11 +241,87 @@ interviews_items_owned <- interviews_items_owned\begin{verbatim}%>%\end{verbatim
 rename(no_listed_items = <NA>)
 \end{minted}
 to rename the column, I see it has replaced the NA with \mintinline{R}|no_listed_items|.
-Perhaps it was just showing NA before because the value was NA, and the Data Carpentry site just expected the value of NA to be shown as \begin{verbatim}/\end{verbatim}.}
+Perhaps it was just showing NA before because the value was NA, and the Data Carpentry site just expected the value of NA to be shown as \begin{verbatim}/\end{verbatim}.
+
 \itemizederror{Lack of Explanation}
 {\item We haven’t really got an explanation for the \mintinline{R}|rowSums| function and the `. in the following argument:
+
 \includegraphics[width=1.0\textwidth]{rstudio_25.PNG}
 \item I wrote the final data frame to a csv file then opened the file in Excel to inspect it. \item Success.}
 \textbf{Result}: Lesson 4 is complete, and questions are prepared for consultation hour. Next task: complete ‘Lesson 5: Data Visualisation with ggplot2.’
+
+\section{Thursday October 24th 2019}
+
+\subsection{Data Carpentry}
+
+\textbf{Intention}: Complete final lesson for Working with R for Social Scientists: Data Visualisation with ggplot2.
+
+\textbf{Actions}: Working through the instructions on the Data Carpentry site, I finish the last lesson for R, answering the following questions:
+
+\textit{What are the components of a ggplot?}
+
+Source data, mapping, variable, geoms, x-axis, y-axis, layers (using + sign), transparency, aesthetics
+
+\mintinline{R}|ggplot(data = <DATA>, mapping = aes(<MAPPINGS>)) +  <GEOM_FUNCTION>()|
+
+\textit{How do I create scatterplots, boxplots, and barplots?}
+
+Scatterplots - \mintinline{R}|geom_point()|
+
+In completing the exercise by myself, I got the basics right, but mixed up the y- and x- axes:
+
+\begin{minted}[breaklines]{R}
+ggplot(data = interviews_plotting, aes(x = no_membrs, y = respondent_wall_type)) + geom_jitter(aes(color = respondent_wall_type), alpha = 0.5)
+\end{minted}
+
+(Should have been \mintinline{R}|ggplot(data = interviews_plotting, aes(x = village, y = rooms)) + geom_jitter(aes(color = respondent_wall_type))|)
+
+\includegraphics[width=1.0\textwidth]{rstudio_26.PNG}
+
+Boxplots- \mintinline{R}|geom_boxplot()|
+
+\itemizederror{Change Boxplot to be in front of jitter?}
+{\item What do you need to change in the code to put the boxplot in front of the points such that it’s not hidden?
+\item I tried a number of things, including switching the order of the \mintinline{R}|boxplot| and \mintinline{R}|jitter|, but this came up with an error. I also tried switching around the alpha values, that did not work. A question for consultation hours.}
+
+Barplots- \mintinline{R}|geom_line()|
+
+In the \mintinline{R}|barplot| exercise, I used \mintinline{R}|filter(memb_assoc != "NA")| based on the example given, rather than \mintinline{R}|filter(!is.na(memb_assoc))| in the Solution, but I still appeared to produce the same result.
+
+\textit{How can I change the aesthetics (ex. colour, transparency) of my plot?}
+
+\mintinline{R}|aes(alpha = ) aes(color = )|
+
+\textit{How can I create multiple plots at once?}
+
+Faceting: `allows the one plot to be split into multiple plots based on a factor included in the dataset.’
+
+\underline{Exercise}: \textit{Experiment with at least two different themes. Build the previous plot using each of those themes. Which do you like best?}
+
+I actually liked \mintinline{R}|theme_bw()| the best. I tried the dark theme, it was not overly clear or easy to read, but looked cool and moody.
+
+\itemizederror{Customistation?}
+{\item For the final exercise where it asks you to play around a bit with customisation and colours, I followed the}
+\begin{verbatim}http://docs.ggplot2.org/current/ggtheme.html\end{verbatim}
+link and tried this section:
+
+\includegraphics[width=1.0\textwidth]{rstudio_27.PNG}
+
+It wrote this
+
+\includegraphics[width=1.0\textwidth]{rstudio_28.PNG}
+
+I’m not sure what this means, but no errors came up(?)
+
+Successfully saved my plot as a png in the \mintinline{R}|fig_output| folder using \mintinline{R}|ggsave()|.
+
+\textbf{Result}: Data Carpentry lessons for R for Social Scientists completed and documented.
+
+\underline{Notes}: I have been using Word due to inability to effectively use OverLeaf, in light of time constraints. I will be meeting with Brian next Wednesday, so I will hopefully be able to work through data recovery and OverLeaf stuff then. (Update: Brian helped me transfer my text into Overleaf for uploading later for marking - 1-11-19).
+
+
+
+
+
 
 \end{document}
