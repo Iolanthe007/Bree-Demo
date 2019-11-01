@@ -4,9 +4,6 @@
 \usepackage{foar705journal}
 \usepackage{subfiles}
 \usepackage{minted}
-%https://www.overleaf.com/learn/latex/Code_Highlighting_with_minted
-\usepackage{ifthen}
-%https://tex.stackexchange.com/questions/170739/fancyverb-error-when-using-minted-in-a-ifthenelse
 \usepackage{graphicx}
 \usepackage{enumitem}
 
@@ -14,7 +11,6 @@
 
 \newboolean{printCode}
 \setboolean{printCode}{true}
-%https://tex.stackexchange.com/questions/170739/fancyverb-error-when-using-minted-in-a-ifthenelse
 
 \newcommand{\startdeflist}[0]
 {\begin{description}[style=unboxed, labelwidth=\linewidth,
@@ -61,7 +57,7 @@ Using \mintinline{R}|factor()|
 
 \textit{Describe the difference between a factor and a string.}
 
-Im not sure about this one.
+I'm not sure about this one.
 
 \textit{Why would I want strings to be treated differently?}
 
@@ -71,13 +67,9 @@ Depends on the type of data analysis you wish to employ and how you what to extr
 
 By specifying the factor you wish to rename using \mintinline{R}|[]| with an integer inside and assigning (using an arrow) the new name. To reorder them, you use the assign function, combine function and factor function, eg.
 
-\ifprintCode
-%https://tex.stackexchange.com/questions/170739/fancyverb-error-when-using-minted-in-a-ifthenelse
 \begin{minted}[breaklines]{R}
 memb_assoc <- factor(memb_assoc, levels = c("No", "Yes", "Undetermined"))
 \end{minted}
-\fi
-%https://tex.stackexchange.com/questions/170739/fancyverb-error-when-using-minted-in-a-ifthenelse
 
 \textit{How do I change how character strings are handled in a data frame?}
 
@@ -122,7 +114,6 @@ I then try \mintinline{R}|head(interviews)|, which returns this:
 
 \includegraphics[width=1.0\textwidth]{rstudio_18.PNG}
 
-
 \itemizederror{Missing Variable?}
 {\item (refer to previous section and above images)
 \item Not sure how to interpret it, but I didnt get an error for once.
@@ -144,6 +135,7 @@ I did the first part correctly (\mintinline{R}|interviews <- interviews[100, ]|)
 
 \textbf{Result:} Lesson 3 completed (to best of my ability) and recorded in Learning Journal.
 
+\newpage
 \section{Wednesday October 23rd 2019}
 
 \subsection{Data Carpentry}
@@ -177,47 +169,48 @@ Pipes is the preferred method.
 Exercise – my answer: 
 
 \begin{minted}[breaklines]{R}
-interviews_members <- interviews%>%
-filter(memb_assoc == "yes")%>%
+interviews_members <- interviews %>%
+filter(memb_assoc == "yes") %>%
 select(affect_conflicts, liv_count, no_meals)
 \end{minted}
-
 
 \itemizederror{Understanding Filter Function}
 {\item Checking solution, I see that I got this down pat.}
 
-
 \mintinline{R}|interviews_god <- select(filter(interviews, village == "God"), no_membrs, years_liv|
-
 
 I don’t understand the break down of this construction. \mintinline{R}|filter| acts on 
 \mintinline{R}|interviews| as the data frame, but what data frame does \mintinline{R}|select work| on in order to also select \mintinline{R}|no_members| and \mintinline{R}|years_liv| ?
 
-
-
-
 \textit{How can I create new columns or remove existing columns from a data frame}?
 Using the \mintinline{R}|mutate| function, you can add a column by using information in other columns.
 In the exercise, I got an answer that was close, but in the wrong order:
+
 \begin{minted}[breaklines]{R}
-interviews_village <- interviews%>%
-select(village)%>%
-mutate(total_meals = no_members*no_meals)%>%
+interviews_village <- interviews %>%
+select(village) %>%
+mutate(total_meals = no_members*no_meals) %>%
 select(total_meal > 20)
 The correct answer was:
-interviews_village <- interviews%>%
-mutate(total_meals = no_membrs * no_meals)%>%
-filter(total_meal > 20)%>%
+interviews_village <- interviews %>%
+mutate(total_meals = no_membrs * no_meals) %>%
+filter(total_meal > 20) %>%
 select(village, total_meals)
 \end{minted}
+
 I realised after trying it out that it should be \mintinline{R}|no_membrs|, not \mintinline{R}|no_members|, and I made a typo when writing \mintinline{R}|total_meals| (I left off the s).
 After fixing these small issues, it worked fine.
+
 \textit{How can I reformat a dataframe to meet my needs}?
-Eeshaping by gathering and spreading – creating new tables using variables and values within the original data frame.
+
+Reshaping by gathering and spreading – creating new tables using variables and values within the original data frame.
+
 \itemizederror{Mismatch between Data Carpentry and RStudio}
 {\item When completing the exercise for this, I copied the instructions directly into RStudio, and I couldn’t see the correlation between what I was seeing in RStudio and on the Data Carpentry website.
 \item It indicated that a separate new table would be created with 4 rows, but it appeared to just add them onto the end of the existing table:
+
 \includegraphics[width=1.0\textwidth]{rstudio_22.PNG}
+
 This seems to be how it’s supposed to work, but I’m not fully wrapping my head around the concept. The highlighted line is the one I’m having trouble understanding:
 
 \includegraphics[width=1.0\textwidth]{rstudio_23.PNG}}
@@ -225,36 +218,45 @@ This seems to be how it’s supposed to work, but I’m not fully wrapping my he
 \itemizederror{??}
 {\item The exercise going through the Applying \mintinline{R}|spread()| to clean our data process states that the last column in the data frame after running }
 
-
 \begin{minted}[breaklines]{R}
-interviews_items_owned <- interviews \begin{verbatim}%>%\end{verbatim}
-separate_rows(items_owned, sep=";") \begin{verbatim}%>%\end{verbatim}
-mutate(items_owned_logical = TRUE) \begin{verbatim}%>%\end{verbatim}
+interviews_items_owned <- interviews
+separate_rows(items_owned, sep=";")  %>%\end{verbatim}
+mutate(items_owned_logical = TRUE)  %>%\end{verbatim}
 spread(key = items_owned, value = items_owned_logical, fill = FALSE)’
 \end{minted}
-is \begin{verbatim}/\end{verbatim}
-and that it needs to be renamed to be called `NA, but mine is already called that:
+
+is / and that it needs to be renamed to be called `NA', but mine is already called that:
+
 \includegraphics[width=1.0\textwidth]{rstudio_24.PNG}
+
 Reading further on, after running
+
 \begin{minted}[breaklines]{R}
-interviews_items_owned <- interviews_items_owned\begin{verbatim}%>%\end{verbatim}
+interviews_items_owned <- interviews_items_owned %>%
 rename(no_listed_items = <NA>)
 \end{minted}
+
 to rename the column, I see it has replaced the NA with \mintinline{R}|no_listed_items|.
-Perhaps it was just showing NA before because the value was NA, and the Data Carpentry site just expected the value of NA to be shown as \begin{verbatim}/\end{verbatim}.
+
+Perhaps it was just showing NA before because the value was NA, and the Data Carpentry site just expected the value of NA to be shown as /.
 
 \itemizederror{Lack of Explanation}
 {\item We haven’t really got an explanation for the \mintinline{R}|rowSums| function and the `. in the following argument:
 
 \includegraphics[width=1.0\textwidth]{rstudio_25.PNG}
+
 \item I wrote the final data frame to a csv file then opened the file in Excel to inspect it. \item Success.}
+
 \textbf{Result}: Lesson 4 is complete, and questions are prepared for consultation hour. Next task: complete ‘Lesson 5: Data Visualisation with ggplot2.’
 
+\newpage
 \section{Thursday October 24th 2019}
 
 \subsection{Data Carpentry}
 
 \textbf{Intention}: Complete final lesson for Working with R for Social Scientists: Data Visualisation with ggplot2.
+
+\subsubsection{Lesson 4: Data Visualisation with ggplot2}
 
 \textbf{Actions}: Working through the instructions on the Data Carpentry site, I finish the last lesson for R, answering the following questions:
 
@@ -274,7 +276,10 @@ In completing the exercise by myself, I got the basics right, but mixed up the y
 ggplot(data = interviews_plotting, aes(x = no_membrs, y = respondent_wall_type)) + geom_jitter(aes(color = respondent_wall_type), alpha = 0.5)
 \end{minted}
 
-(Should have been \mintinline{R}|ggplot(data = interviews_plotting, aes(x = village, y = rooms)) + geom_jitter(aes(color = respondent_wall_type))|)
+Should have been
+\begin{minted}[breaklines]{R}
+ggplot(data = interviews_plotting, aes(x = village, y = rooms)) + geom_jitter(aes(color = respondent_wall_type))
+\end{minted}
 
 \includegraphics[width=1.0\textwidth]{rstudio_26.PNG}
 
@@ -319,9 +324,34 @@ Successfully saved my plot as a png in the \mintinline{R}|fig_output| folder usi
 
 \underline{Notes}: I have been using Word due to inability to effectively use OverLeaf, in light of time constraints. I will be meeting with Brian next Wednesday, so I will hopefully be able to work through data recovery and OverLeaf stuff then. (Update: Brian helped me transfer my text into Overleaf for uploading later for marking - 1-11-19).
 
+\subsection{Data Recovery - Duplicati}
 
+\textbf{Intention}: Establish data recovery plan using Duplicati. I have realised that the original setup I had using this method backed my files up onto my laptop itself. If my laptop were to be stolen or run over by a truck, it would all be gone. I need a Cloud-based save destination. I have a Microsoft One Drive, so maybe I can use that.
 
+\textbf{Acitons}: Opening Duplicati 2, I delete my previous attempts at configuring data back up for my FOAR705 folder on my laptop.
 
+\itemizederror{Cannot Setup Cloud-Based Backup}
+{\item I start to set up a new one, selecting One Drive as my save method, but cannot proceed past this screen:}
 
+\includegraphics[width=1.0\textwidth]{duplicati_31.PNG}
+
+I just get this error when testing connection: 
+
+\includegraphics[width=1.0\textwidth]{duplicati_32.PNG}
+
+Despite following these instructions:
+
+\includegraphics[width=1.0\textwidth]{duplicati_33.PNG}
+
+From this website: 
+\begin{verbatim}https://forum.duplicati.com/t/setting-up-onedrive-personal/588\end{verbatim}
+
+It says my page should look like this
+
+\includegraphics[width=1.0\textwidth]{duplicati_34.PNG}
+
+Which it does. But still error 410. I have sent a Slack message to Brian and will ask tomorrow at consultation hours.
+
+\textbf{Result}: Duplicati partially set up again. Learning journal uploaded to CloudStor 24/10/19 as pdf.
 
 \end{document}
