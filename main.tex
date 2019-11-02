@@ -249,7 +249,6 @@ Perhaps it was just showing NA before because the value was NA, and the Data Car
 
 \textbf{Result}: Lesson 4 is complete, and questions are prepared for consultation hour. Next task: complete ‘Lesson 5: Data Visualisation with ggplot2.’
 
-\newpage
 \section{Thursday October 24th 2019}
 
 \subsection{Data Carpentry}
@@ -324,7 +323,7 @@ Successfully saved my plot as a png in the \mintinline{R}|fig_output| folder usi
 
 \underline{Notes}: I have been using Word due to inability to effectively use OverLeaf, in light of time constraints. I will be meeting with Brian next Wednesday, so I will hopefully be able to work through data recovery and OverLeaf stuff then. (Update: Brian helped me transfer my text into Overleaf for uploading later for marking - 1-11-19).
 
-\subsection{Data Recovery - Duplicati}
+\subsection{Duplicati - Data Recovery}
 
 \textbf{Intention}: Establish data recovery plan using Duplicati. I have realised that the original setup I had using this method backed my files up onto my laptop itself. If my laptop were to be stolen or run over by a truck, it would all be gone. I need a Cloud-based save destination. I have a Microsoft One Drive, so maybe I can use that.
 
@@ -354,7 +353,6 @@ Which it does. But still error 410. I have sent a Slack message to Brian and wil
 
 \textbf{Result}: Duplicati partially set up again. Learning journal uploaded to CloudStor 24/10/19 as pdf.
 
-\newpage
 \section{Friday October 25th 2019}
 
 \subsection{Duplicati - Data Recovery}
@@ -369,8 +367,7 @@ Which it does. But still error 410. I have sent a Slack message to Brian and wil
 
 \textbf{Result}: Files successfully set up to be backed up every night to two online destinations. Organised to demonstrate data recovery next week with Brian. (Update: data recovery was successful. at first, I didn't realise I had to save a file of the configuration and send it to myself via email, but after seeing how this is done, the process made sense. 30-10-19)
 
-\newpage
-\section{Thursday October 21st 2019}
+\section{Thursday October 31st 2019}
 
 \subsection{Proof of Concept R Scripts}
 
@@ -403,8 +400,253 @@ We also create a variable to incorporate into the For Loop that will parse all t
 
 \includegraphics[width=1.0\textwidth]{rstudio_50.PNG}
 
-When running this script, all YAML files are parsed in RStudio, then the dataURL that contains the information for the PNG files is extracted, the head of the dataURL is removed, as it is not needed, then what is left is decoded from Base64 (I downloaded the base64enc package for this), then written as a PNG file into the output_data folder.
+When running this script, all YAML files are parsed in RStudio, then the dataURL that contains the information for the PNG files is extracted, the head of the dataURL is removed, as it is not needed, then what is left is decoded from Base64 (I downloaded the base64enc package for this), then written as a PNG file into the output\_data folder.
 
 \textbf{Result}: Script for extracting source images from YAML files runs successfully and outputs the PNG files to the output\_data folder.
+
+\subsubsection{Compare Gardiner Codes}
+
+\textbf{Intention}: Develop R script that can isolate a series of pieces of information identified as `Gardiner Codes' and assign these values to variables that can be compared one to one and the exact matches calculated in order to determine what percentage the aotu-classify tool got correct.
+
+\textbf{Actions}: To prepare for this code, I created two YAML (.yml) files from the HI Workbench, both with the same selection of hieroglyphic signs, but one I manually classified myself and the other I let the program auto-classify them. I call them \textit{Correct Gardiner Codes} and \textit{Incorrect Gardiner Codes}.
+
+At first, I work on parsing the YAML files, isolating the Gardiner Codes, which are contained within an unnamed directory like above, and write them to separate text (.txt) files.
+
+The code looks like this:
+
+\includegraphics[width=1.0\textwidth]{rstudio_52.PNG}
+
+When run, it successfully outputs two text files with the Gardiner Codes listed within them. Okay, cool...now what?
+
+\itemizederror{How do I compare two .txt files?}
+{\item I got a bit stuck when it came to actually comparing the two lists of Gardiner Codes.
+\item Would I need to assign the contents of the two txt files to vectors, then compare them line by line?
+\item How would I removed the first line, which is just a heading?}
+
+\includegraphics[width=1.0\textwidth]{rstudio_51.PNG}
+
+I figured outputting the lists to txt files was a bit unnecessary and started working on extracting the Gardiner Codes using For Loops and assigning them to vectors in one go. See below:
+
+\underline{Calculate Number of Records}:
+
+\begin{minted}[breaklines]{R}
+yamldata1 <- yaml.load_file(file.path("data","incorrect-gardiner-codes.yml"))
+
+NumberOfRecords <- 0
+
+for (sentence in yamldata1$project$sentences)
+{
+  for (word in sentence$words)
+  {
+    for (glyph in word$glyphs)
+    {
+      NumberOfRecords <- NumberOfRecords + 1
+    }
+  }
+}
+print(NumberOfRecords)
+\end{minted}
+
+\underline{Parse and Vectorise First File}:
+
+\begin{minted}[breaklines]{R}
+DataVector1 <- vector("character", length = 0)
+
+for (sentence in yamldata1$project$sentences)
+{
+  for (word in sentence$words)
+  {
+    for (glyph in word$glyphs)
+    {
+      DataVector1 <- c(DataVector1, glyph$gardinerCode)
+    }
+  }
+}
+print(DataVector1)
+\end{minted}
+
+\underline{Parse and Vectorise Second File}:
+
+\begin{minted}[breaklines]{R}
+yamldata2 <- yaml.load_file(file.path("data","correct-gardiner-codes.yml"))
+DataVector2 <-vector("character", length = 0)
+
+for (sentence in yamldata2$project$sentences)
+{
+  for (word in sentence$words)
+  {
+    for (glyph in word$glyphs)
+    {
+      DataVector2 <- c(DataVector2, glyph$gardinerCode)
+    }
+  }
+}
+print(DataVector1)
+print(DataVector2)
+\end{minted}
+
+\underline{Count Exact Matches in Files 1 and 2}:
+
+\begin{minted}[breaklines]{R}
+Count <- 1
+MatchCount <- 0
+
+while (Count <= NumberOfRecords)
+{
+  
+  if(DataVector1[Count] == DataVector2[Count])
+  {
+    MatchCount <- MatchCount + 1
+  }
+  print(DataVector1[Count])
+  print(DataVector2[Count])
+  print(Count)
+  print(MatchCount)
+  Count <- Count + 1
+}
+\end{minted}
+
+\underline{Calculate Percentage of Correct Matches}:
+
+\begin{minted}[breaklines]{R}
+PercentMatch <- MatchCount/NumberOfRecords*100
+print(format(PercentMatch, digits=2, nsmall=2))
+\end{minted}
+
+I included \mintinline{R}|print| functions throughout so I could keep tabs on everything that is happening as the script runs. I used a \mintinline{R}|while| function instead of a For Loop for the Count, as I tried a For Loop, but could not get it to work the way I wanted it to, so I switched to something new and it worked how I wanted it, so I went with that. I got the script to give the outcome as a percentage (which came out as 25.00. The auto-classify function got 3 out of the 12 hieroglyphic signs...oh dear. Oh well, not the focus of the project at hand. The code works!)
+
+\subsubsection{Unit Testing my Code}
+
+\textbf{Intention}: Develop R script to test that the two R scripts that I have developed run as expected and give the expected output. To do this, I have to learn how to use the \mintinline{R}|testthat| package to create functions that tailor to specific script functions. (I learned this from Brian).
+
+\textbf{Actions}: Following these two pages/sites:
+
+\begin{verbatim}
+https://towardsdatascience.com/unit-testing-in-r-68ab9cc8d211
+
+https://cran.r-project.org/web/packages/testthat/testthat.pdf?
+fbclid=IwAR07Bud7-Zkp9C-2np4B_TtlhR3cEtotpOlPUISUQDjl5vlOOVU6n
+pqWuPo
+\end{verbatim}
+%https://cran.r-project.org/web/packages/testthat/testthat.pdf?fbclid=IwAR07Bud7-Zkp9C-2np4B_TtlhR3cEtotpOlPUISUQDjl5vlOOVU6npqWuPo
+
+and with help from Brian and my dad, I develop a function that is supposed to test that the file path is followed and a vector is generated. (I also install the \mintinline{R}|testthat| package for this to work)
+
+\begin{minted}[breaklines]{R}
+library(testthat)
+
+test_filename <- "incorrect-gardiner-codes.yml"
+
+count_NumberOfRecords <- function(filename)
+  {
+  yamldata <- yaml.load_file(file.path("data",filename))
+   NumberOfRecords <- 0
+   for (sentence in yamldata$project$sentences)
+   {
+     for (word in sentence$words)
+     {
+       for (glyph in word$glyphs)
+       {
+         NumberOfRecords <- NumberOfRecords + 1
+       }
+     }
+   }
+   
+  return(NumberOfRecords)
+}
+
+count_NumberOfRecords(test_filename)
+
+test_that("create vector", expect_equal(count_NumberOfRecords("incorrect-gardiner-codes.yml"), 12))
+\end{minted}
+
+I run this script then run the following code in a new script file:
+
+\begin{minted}[breaklines]{R}
+test_file("scripts/Unit-Testing-Code.R")
+\end{minted}
+
+The test function returns this:
+
+\includegraphics[width=0.5\textwidth]{rstudio_54.PNG}
+
+\textbf{Result}: The test failed, but the rubric says I only have to attempt the unit testing, and I did give it a go, despite my lack of knowledge.
+
+\section{Friday November 1st 2019}
+
+\subsection{Setting up Code Ocean}
+
+\subsubsection{Establishing Environment}
+
+\textbf{Intention}: Set up environment within Code Ocean capsule to exactly match that of my working directory for my Proof of Concept R project.
+
+\textbf{Actions}: Going into the `environment' tab in the capsule, I add the necessary packages (\mintinline{R}|yaml|, \mintinline{R}|base64enc|, and \mintinline{R}|testthat| (I initially forgot this one, but picked up on it later))
+
+\textbf{Result}: Environment set up.
+
+\subsubsection{Organising Files}
+
+\textbf{Intention}: Place the necessary files (ie. R scripts, .yml files) in the appropriate directories within the Code Ocean capsule.
+
+\textbf{Actions}: I upload the git repository for my Proof of Concept R project into the capsule, and copy the 4 R scripts into the `codes' directory, and the 3 .yml files into the `data' directory.
+
+\textbf{Result}: Files organised into appropriate directories within my Code Ocean capsule.
+
+\subsubsection{Reproducible Run}
+
+\textbf{Intention}: Run the code with the environment set up and see if everything runs successfully.
+
+\textbf{Actions}: I click the Reproducible Run button.
+
+\itemizederror{Cannot open connection}
+{\item I try to run the code after establishing Extract-Image-Files.R (or so I thought) as the main code to run, clicking the Reproducible Run button.
+\item Some of the code runs alright, but I can see that part of the code is halted due to the error 'Cannot open connection'
+\item I try changing up the file path in Extract-Source-Images.R, replacing ``data" with ``../data", ``./data"; ``..", ``data"; ``.",``data". 
+\item Still getting the error.
+\item I consult Brian on the matter over Slack, and he points out that the main code the Reproducible Run runs is actually Extract-Gardiner-Codes.R, so changing the file path in the Extract-Source-Images.R file wouldn't fix the problem.}
+
+\includegraphics[width=1.0\textwidth]{rstudio_55.PNG}
+
+Brian explains to me that Code Ocean has a specific style of writing file paths, which was something I had noticed when looking for help here:
+
+\begin{verbatim}
+    https://help.codeocean.com/en/articles/1082877-paths
+\end{verbatim}
+
+I change the order of the R scripts to:
+\\Commpare-Gardiner-Codes.R
+
+Extract-Source-Images.R
+\\Unit-Testing-Code.R
+\\Unit-Testing-Code\_test\_file.R
+
+because I'm pretty sure the first Unit Testing script needs to be run before the other one for them to actually work. I could be wrong, but again. I tried.
+
+\textbf{Result}: Code Ocean Capsule nearly complete. I try to click Submit for Publication, but it is telling me I haven't completed all of the necessary steps. Apparently I need to fill out more metadata information before I can submit.
+
+\subsubsection{Submit for Publication}
+
+\textbf{Intention}: Submit capsule for verification and then publication in order to complete process and then include in final project.
+
+\textbf{Actions}: After filling in the required metadata fields, including author name, subject field, and a short description, I click the Submit for Publication button.
+
+\itemizederror{5 Business Days to Verify}
+{\item I notice that I do not have the option to Share my capsule and thus cannot generate a url intended to be shared online.
+\item I notice at the top of my Workspace, it says that my capsule is still being verified. I Google how long this process usually takes.
+\item Apparently it can take up to 5 business days. Which means my capsule may not be published until Friday. This project is due a 2pm on Saturday, and I am working all day on Saturday.
+\item I message Brian asking for his advice. As I have already shared access to my capsule with the Collaborate function of the site, he should be able to access it even while it is in the middle of the verification process.
+\item I send him the link again just to double check and he states that it works. Good enough, I suppose.}
+
+\textbf{Result}: Code Ocean capsule complete and ready to be added to Proof of Concept project.
+
+\section{Saturday November 2nd 2019}
+
+\subsection{Completing Proof of Concept Project}
+
+\textbf{Intention}: Finish off the final few things I need to do in order to complete my Proof of Concept project. I have completed the R scripts now, and just need to finish the Read Me file, the Acceptance Tests file (which tells you how to use the Code Ocean capsule), and then that should be it.
+
+\textbf{Actions}: Using the GitHub interface, I edit the ReadMe file so that it includes instructions on how to follow the Code Ocean link, run the code (using the Acceptance Tests file), and how to generally navigate the repository (including a note that the version control history is actually in the other repository called Proof-of-Concept rather than Proof-of-Concept\_Final).
+
+\textbf{Result}: Git Repository complete and ready for marking. Learning Journal complete and ready for marking. Exporting as .pdf and uploading in 3..2..
 
 \end{document}
